@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MythBusters Lab — Digital Science Game</title>
+<style>
+:root{--bg:#08111f;--panel:#111f33;--panel2:#172942;--line:#29415e;--cyan:#5ee7df;--gold:#ffd166;--pink:#ff78b7;--ink:#edf6ff;--muted:#a8bad0;--green:#78e6a2}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 80% 0,#17385a 0,#08111f 45%);color:var(--ink);font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
+header{padding:18px clamp(16px,4vw,42px);display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);position:sticky;top:0;background:#08111fee;backdrop-filter:blur(12px);z-index:4}
+.logo{font-weight:900;letter-spacing:.08em}.logo span{color:var(--cyan)}.stats{display:flex;gap:10px;flex-wrap:wrap}.pill{background:var(--panel2);border:1px solid var(--line);padding:6px 12px;border-radius:99px;font-size:13px}
+main{max-width:1100px;margin:auto;padding:26px 18px 60px}.hero{padding:26px 0 20px}.eyebrow{color:var(--cyan);font-weight:800;letter-spacing:.16em;font-size:12px}.hero h1{font-size:clamp(34px,7vw,62px);line-height:1.02;margin:10px 0}.hero p{color:var(--muted);max-width:660px}
+.layout{display:grid;grid-template-columns:280px 1fr;gap:18px}.panel{background:linear-gradient(160deg,#14263d,#0f1b2c);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:0 18px 45px #0003}.case-list{display:grid;gap:8px;max-height:650px;overflow:auto;padding-right:3px}.case-btn{width:100%;text-align:left;border:1px solid var(--line);background:#102039;color:var(--ink);padding:13px;border-radius:14px;cursor:pointer}.case-btn.active{border-color:var(--cyan);background:#15334a}.case-btn:disabled{opacity:.48;cursor:not-allowed}.case-btn:disabled:hover{background:#102039}.case-btn small{display:block;color:var(--muted)}button{font:inherit}button:focus-visible,input:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+h2{margin:0 0 8px;font-size:25px}.muted{color:var(--muted)}.game-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}.tag{font-size:12px;color:var(--gold);font-weight:800;letter-spacing:.12em}
+.stage{margin-top:16px;background:#071321;border:1px solid #29415e;border-radius:17px;overflow:hidden;position:relative}.stage-top{display:flex;justify-content:space-between;align-items:center;padding:12px 15px;background:#10223a;border-bottom:1px solid var(--line);gap:10px;flex-wrap:wrap}.stage canvas{display:block;width:100%;height:330px;background:linear-gradient(#102e49,#0b192a 75%)}.controls{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}.btn{border:0;border-radius:12px;padding:11px 15px;font-weight:800;cursor:pointer;background:var(--cyan);color:#06202b}.btn.secondary{background:#203752;color:var(--ink);border:1px solid var(--line)}.btn.gold{background:var(--gold);color:#332400}.btn:disabled{opacity:.4;cursor:not-allowed}
+.sliders{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px}.control-card{background:#102039;border:1px solid var(--line);padding:12px;border-radius:13px}.control-card label{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);gap:10px}.control-card input{width:100%;accent-color:var(--cyan);margin-top:10px}
+.result{margin-top:14px;border:1px solid var(--line);background:#102039;padding:14px;border-radius:14px;min-height:70px}.result strong{color:var(--green)}.choices{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}.choice{border:1px solid var(--line);background:#14263d;color:var(--ink);border-radius:12px;padding:10px 14px;cursor:pointer}.choice.selected{border-color:var(--gold);background:#3a321f}
+.progress{height:8px;background:#263b54;border-radius:9px;overflow:hidden;margin:10px 0}.progress span{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--green));width:0;transition:width .3s}
+.footer-note{font-size:12px;color:var(--muted);margin-top:18px}.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#e8fff3;color:#06351d;padding:10px 16px;border-radius:99px;font-weight:800;display:none;z-index:9;box-shadow:0 8px 30px #0006}
+@media(max-width:760px){.layout{grid-template-columns:1fr}.case-list{grid-template-columns:repeat(2,minmax(0,1fr))}.case-btn{font-size:13px}.stage canvas{height:290px}.sliders{grid-template-columns:1fr}header{align-items:flex-start;gap:10px;flex-direction:column}}
+
+/* VISUAL UPGRADE — neon science command centre */
+:root{--cyan:#64f4ed;--gold:#ffcf70;--panel:#101f35;--line:#294968}
+body{
+ background:
+ radial-gradient(ellipse at 12% 8%,#174c69aa 0,transparent 34%),
+ radial-gradient(ellipse at 88% 18%,#412a70aa 0,transparent 32%),
+ radial-gradient(ellipse at 50% 100%,#0c3850 0,transparent 42%),
+ #060d19;
+ background-attachment:fixed;
+}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.2;z-index:-1;
+ background-image:radial-gradient(#8bdcf0 1px,transparent 1px);background-size:34px 34px;
+ mask-image:linear-gradient(to bottom,#000,transparent 85%)}
+header{background:linear-gradient(100deg,#071322f2,#10243aeb);border-bottom:1px solid #3a6481;box-shadow:0 10px 35px #0005}
+.logo{font-size:16px;text-shadow:0 0 18px #5ee7df66}
+.pill{background:linear-gradient(135deg,#18334d,#111f35);border-color:#345b78;box-shadow:inset 0 1px #ffffff12,0 5px 16px #0002}
+.hero{padding-top:38px;padding-bottom:26px}
+.hero .eyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border:1px solid #3b7c8b;border-radius:99px;background:#0d354455;box-shadow:0 0 22px #5ee7df17}
+.hero h1{text-shadow:0 5px 35px #5ee7df22;letter-spacing:-.045em}
+.hero p{font-size:17px;line-height:1.7}
+.panel{background:linear-gradient(145deg,#152a43ed,#0c1a2ced 68%,#10233a);border-color:#355572;box-shadow:0 24px 65px #0006,inset 0 1px #ffffff12;backdrop-filter:blur(14px)}
+.panel h2{letter-spacing:-.025em}
+.case-btn{position:relative;overflow:hidden;background:linear-gradient(110deg,#10223a,#132a43);border-color:#2d4e6b;transition:transform .2s,border-color .2s,box-shadow .2s,background .2s}
+.case-btn:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(var(--cyan),#8c7bff);opacity:0;transition:opacity .2s}
+.case-btn:hover:not(:disabled){transform:translateX(3px);border-color:#5ee7df88;box-shadow:0 7px 22px #0004}
+.case-btn.active{background:linear-gradient(110deg,#16445a,#1b3150);border-color:var(--cyan);box-shadow:0 0 0 1px #5ee7df33,0 0 24px #5ee7df18}
+.case-btn.active:before{opacity:1}
+.case-btn small{margin-top:3px;font-size:11px;letter-spacing:.02em}
+.game-head h2{font-size:29px;text-shadow:0 0 22px #5ee7df12}
+.tag{color:var(--gold);text-shadow:0 0 15px #ffd16644}
+.stage{border-color:#39718a;box-shadow:inset 0 0 30px #5ee7df0b,0 16px 35px #0005}
+.stage-top{background:linear-gradient(90deg,#122d47,#172642);border-bottom-color:#345b78}
+.stage-top b{letter-spacing:.1em;font-size:12px;color:#8df7f0}
+.stage canvas{height:350px;background:radial-gradient(ellipse at 50% 45%,#153c5b,#081525 75%)}
+.control-card{background:linear-gradient(145deg,#152c47,#0e1d31);border-color:#355673;box-shadow:inset 0 1px #ffffff0c}
+.control-card label b{color:var(--cyan);font-variant-numeric:tabular-nums}
+.control-card input{cursor:pointer}
+input[type=range]{height:6px}
+input[type=range]::-webkit-slider-thumb{box-shadow:0 0 0 5px #5ee7df20,0 0 15px #5ee7df88}
+.btn{background:linear-gradient(120deg,#69f4e9,#38c9d8);box-shadow:0 8px 22px #35d5d433;transition:transform .18s,filter .18s,box-shadow .18s}
+.btn:hover:not(:disabled){transform:translateY(-2px);filter:brightness(1.08);box-shadow:0 12px 28px #35d5d455}
+.btn.secondary{background:linear-gradient(120deg,#203d5b,#1a2d48);box-shadow:none}
+.btn.gold{background:linear-gradient(120deg,#ffe09a,#ffbd55);box-shadow:0 8px 22px #ffbd5533}
+.choice{background:linear-gradient(145deg,#172e49,#122239);transition:all .18s}
+.choice:hover{border-color:#5ee7df99;transform:translateY(-1px)}
+.choice.selected{border-color:var(--gold);background:linear-gradient(135deg,#4a3a1d,#302b28);box-shadow:0 0 0 1px #ffd16644,0 0 20px #ffd1661c}
+.result{background:linear-gradient(145deg,#132b44,#0e1d31);border-color:#355673;box-shadow:inset 0 1px #ffffff0b}
+.progress{height:10px;background:#1d344d;border:1px solid #34516e}
+.progress span{box-shadow:0 0 14px #5ee7df88}
+.footer-note{line-height:1.6}
+@media(max-width:760px){.stage canvas{height:300px}.hero{padding-top:25px}}
+
+</style></head>
+<body>
+<header><div class="logo">🧪 MYTHBUSTERS <span>LAB</span></div><div class="stats"><div class="pill">⭐ XP <b id="xp">0</b></div><div class="pill">🏅 Missions <b id="solved">0</b>/24</div><div class="pill">🔬 Rank <b id="level">1</b></div><div class="pill">🔥 Streak <b id="streak">0</b></div></div></header>
+<main>
+<section class="hero"><div class="eyebrow">DIGITAL SCIENCE ARCADE · NO REAL-WORLD MATERIALS</div><h1>Question everything.<br><span style="color:var(--cyan)">Test it virtually.</span></h1><p>Welcome, investigator. Enter a virtual lab, change the experiment, run the simulation and use the evidence to crack each science myth.</p></section>
+<div class="layout"><aside class="panel"><h2>Case files</h2><p class="muted" style="font-size:13px">Choose a mission. Complete its simulation and verdict to earn XP.</p><div class="progress"><span id="overall"></span></div><div class="case-list" id="missionList"></div><div class="footer-note">All 24 missions unlock in order. Progress saves in this browser on this device.</div></aside>
+<section class="panel"><div class="game-head"><div><div class="tag" id="caseTag">MISSION 01 · GRAVITY</div><h2 id="caseTitle">The Falling Race</h2><div class="muted" id="caseDesc">Can a heavier object really fall faster?</div></div><div class="pill" id="caseStatus">● READY</div></div>
+<div class="stage"><div class="stage-top"><b id="stageTitle">DROP ZONE</b><span class="muted" id="stageHint">Change the settings, then run the test.</span></div><canvas id="scene" width="800" height="330" role="img" aria-label="Animated virtual science experiment visualization"></canvas></div>
+<div id="missionBrief" class="result" style="margin-top:12px"><b>MISSION BRIEF</b><br>Run a test, inspect the evidence and submit a verdict.</div>
+<div id="controls"></div>
+<div class="controls"><button class="btn" id="run">▶ Run simulation</button><button class="btn secondary" id="reset">↺ Reset</button><button class="btn secondary" id="hint">💡 Reveal a hint</button></div>
+<div class="result" id="result" aria-live="polite">🧠 <b>Your mission:</b> Adjust the experiment and run it to reveal evidence.</div>
+<div style="margin-top:16px"><b>Make your verdict</b><div class="muted" style="font-size:13px">Choose only after running the simulation.</div><div class="choices"><button class="choice" data-verdict="busted">🚫 Myth busted</button><button class="choice" data-verdict="supported">✅ Myth supported</button><button class="choice" data-verdict="depends">🧩 It depends</button></div><button class="btn gold" id="submit" disabled style="margin-top:12px">Submit verdict</button></div>
+<div class="footer-note" id="science">Science briefing: evidence will appear after the simulation.</div>
+</section></div></main><div class="toast" id="toast"></div>
+<script>
+const $=id=>document.getElementById(id);
+const labs={
+fall:{tag:"GRAVITY & AIR RESISTANCE",title:"The Falling Race",desc:"Investigate what changes the way objects fall.",stage:"DROP ZONE",hint:"Compare objects fairly. Change one factor at a time.",science:"Gravity accelerates objects similarly when air resistance is negligible. In air, drag, shape and orientation can change the motion.",defaults:{mass:2,drag:1,height:8},controls:[["mass","Object B mass",1,10,1,"kg"],["drag","Air resistance",0,10,1,"level"],["height","Drop height",3,10,1,"m"]]},
+paper:{tag:"AIR RESISTANCE",title:"The Paper Paradox",desc:"Explore how shape changes the motion of paper.",stage:"WIND TUNNEL",hint:"Compare flat and crumpled paper while changing airflow.",science:"A flat sheet usually experiences more air resistance than a compact crumpled sheet because of its larger area facing the airflow.",defaults:{shape:0,wind:3},controls:[["shape","Paper shape",0,1,1,"flat ↔ crumpled"],["wind","Air movement",0,8,1,"level"]]},
+sound:{tag:"VIBRATIONS & SOUND",title:"Sound Detective",desc:"Track a sound pulse through different materials.",stage:"SOUND LAB",hint:"Select a medium and follow the pulse to the detector.",science:"Sound is a mechanical wave. It travels through gases, liquids and solids, but it needs a medium and cannot travel through a vacuum.",defaults:{medium:0,power:5},controls:[["medium","Transmission medium",0,2,1,"air / water / steel"],["power","Pulse strength",1,10,1,"units"]]},
+float:{tag:"DENSITY & BUOYANCY",title:"The Floating Mystery",desc:"Discover why some objects float and others sink.",stage:"VIRTUAL WATER TANK",hint:"Compare average density and displaced water.",science:"An object floats when the buoyant force can balance its weight. Average density and displaced fluid matter—not weight alone.",defaults:{density:2,volume:5},controls:[["density","Object density",1,10,1,"relative units"],["volume","Object volume",1,10,1,"units"]]}
+};
+const missions=[
+{lab:"fall",name:"Falling basics",brief:"A heavier object is dropped beside a lighter one. Does mass alone decide which lands first?",target:"busted",hint:"Think about what happens when air resistance is small.",xp:60,setup:{drag:0,height:8}},
+{lab:"fall",name:"The drag test",brief:"Now add air resistance. Can drag change the result of a fall?",target:"depends",hint:"Gravity still acts, but air pushes against moving objects.",xp:70,setup:{drag:8,height:8}},
+{lab:"fall",name:"Height challenge",brief:"Run a fair comparison at a new drop height. Does changing the height change the time, or does it change the rule about mass?",target:"busted",hint:"A different height changes the journey, not the basic gravity principle.",xp:80,setup:{drag:1,height:10}},
+{lab:"paper",name:"Paper paradox",brief:"A flat sheet and a crumpled sheet have the same paper mass. Will they fall in the same way?",target:"busted",hint:"Compare the area facing the air.",xp:60,setup:{shape:0,wind:3}},
+{lab:"paper",name:"Wind tunnel",brief:"Increase airflow. Which paper shape is affected more by the moving air?",target:"depends",hint:"More airflow means more drag; the shape changes how strongly it acts.",xp:70,setup:{shape:0,wind:8}},
+{lab:"paper",name:"Design a drop",brief:"Create a fair test: change the paper shape, then explain why the result changed.",target:"busted",hint:"Keep the paper material the same and focus on shape and drag.",xp:80,setup:{shape:1,wind:5}},
+{lab:"sound",name:"Sound pathways",brief:"Can sound travel through more than just air?",target:"busted",hint:"Sound needs particles that can vibrate.",xp:60,setup:{medium:1,power:5}},
+{lab:"sound",name:"Speed detective",brief:"Compare the model's sound speeds in air, water and steel. Which medium carries the pulse fastest here?",target:"depends",hint:"The particles and properties of each material affect wave speed.",xp:70,setup:{medium:2,power:5}},
+{lab:"sound",name:"Signal strength",brief:"Change the pulse strength. Does a stronger pulse mean sound travels through a vacuum?",target:"busted",hint:"A stronger vibration does not remove the need for a medium.",xp:80,setup:{medium:0,power:10}},
+{lab:"float",name:"Density files",brief:"Is being heavy enough to decide whether an object floats?",target:"busted",hint:"Compare the object's average density with the fluid.",xp:60,setup:{density:7,volume:3}},
+{lab:"float",name:"Buoyancy lab",brief:"Change volume and observe how much water an object can displace.",target:"depends",hint:"The buoyant force depends on displaced fluid; weight still matters.",xp:70,setup:{density:3,volume:9}},
+{lab:"float",name:"Master investigator",brief:"Final case: use the evidence to explain why floating depends on more than an object's weight.",target:"depends",hint:"Bring together density, weight and displaced water.",xp:120,setup:{density:5,volume:8}},
+{lab:"fall",name:"Terminal velocity",brief:"In this model, drag rises as an object speeds up. What happens when drag balances the downward force?",target:"depends",hint:"When forces balance, acceleration becomes zero and speed can become steady.",xp:100,setup:{mass:5,drag:9,height:10}},
+{lab:"fall",name:"Parachute engineer",brief:"Design a safer descent by increasing air resistance. Which control has the strongest effect in this model?",target:"depends",hint:"A larger drag setting slows the fall in this simplified model.",xp:110,setup:{mass:4,drag:10,height:10}},
+{lab:"fall",name:"Moon vs Earth",brief:"Imagine the same drop in a place with almost no atmosphere. Which factor matters most to the fall: drag or gravity?",target:"busted",hint:"With almost no atmosphere, air resistance is negligible; gravity still acts.",xp:120,setup:{mass:8,drag:0,height:10}},
+{lab:"paper",name:"Shape engineer",brief:"A designer wants a paper glider to stay in the air longer. How might changing its shape affect drag?",target:"depends",hint:"Shape and orientation influence air resistance; a real glider also needs lift.",xp:100,setup:{shape:0,wind:6}},
+{lab:"paper",name:"The surface-area trap",brief:"Two equal-mass paper sheets have different exposed areas. Does the larger area usually experience more drag in this airflow model?",target:"depends",hint:"More area facing the airflow usually means more drag.",xp:110,setup:{shape:0,wind:7}},
+{lab:"paper",name:"Fair-test investigator",brief:"Plan a fair comparison of flat and crumpled paper. What should remain the same?",target:"busted",hint:"Keep paper type, mass and drop height the same; change only the shape.",xp:120,setup:{shape:1,wind:4}},
+{lab:"sound",name:"Vacuum verdict",brief:"A space probe sends a sound pulse through empty space. Will the sound reach a listener without a medium?",target:"busted",hint:"Sound is a mechanical wave and needs particles to vibrate.",xp:100,setup:{medium:0,power:8}},
+{lab:"sound",name:"Material race",brief:"Compare the model's wave speeds in three media. Which one carries sound fastest in this simulation?",target:"depends",hint:"The model values are highest for steel, then water, then air.",xp:110,setup:{medium:2,power:7}},
+{lab:"sound",name:"Pitch and vibration",brief:"A source vibrates more times each second. Which sound property changes: pitch or the need for a medium?",target:"busted",hint:"Frequency affects pitch; sound still needs a medium.",xp:120,setup:{medium:1,power:9}},
+{lab:"float",name:"Submarine challenge",brief:"A submarine changes its average density using ballast tanks. How can that help it dive or rise?",target:"depends",hint:"Changing average density changes the balance between weight and buoyancy.",xp:100,setup:{density:6,volume:8}},
+{lab:"float",name:"Displacement detective",brief:"An object is pushed deeper into water while still fully submerged. Does the displaced volume keep increasing?",target:"busted",hint:"Once fully submerged, displaced volume equals the object's volume.",xp:110,setup:{density:4,volume:10}},
+{lab:"float",name:"Cargo ship mystery",brief:"A huge steel ship can float even though steel is dense. What explains this?",target:"depends",hint:"The ship's hollow shape makes its average density lower and lets it displace lots of water.",xp:120,setup:{density:5,volume:10}}
+];
+let current=0,values={},verdict=null,ran=false,anim=0,raf=0;
+let solved=JSON.parse(localStorage.getItem("mbSolved12")||"{}");
+let xp=Number(localStorage.getItem("mbXP12")||localStorage.getItem("mbXP")||0),streak=Number(localStorage.getItem("mbStreak12")||0);
+if(!localStorage.getItem("mbSolved12")){
+ const old=JSON.parse(localStorage.getItem("mbSolved")||"{}");
+ if(old.fall)solved[0]=true;if(old.paper)solved[3]=true;if(old.sound)solved[6]=true;if(old.float)solved[9]=true;
+ localStorage.setItem("mbSolved12",JSON.stringify(solved));localStorage.setItem("mbXP12",String(xp));
+}
+function unlocked(i){return i===0||!!solved[i-1]}
+function updateStats(){
+ $("xp").textContent=xp;$("solved").textContent=Object.keys(solved).length;$("level").textContent=1+Math.floor(xp/150);
+ $("streak").textContent=streak;$("overall").style.width=(Object.keys(solved).length/24*100)+"%";
+ document.querySelectorAll("[data-mission]").forEach(b=>{let i=+b.dataset.mission;b.disabled=!unlocked(i);b.classList.toggle("active",i===current);b.innerHTML=(solved[i]?"🏅 ":unlocked(i)?"🔓 ":"🔒 ")+(String(i+1).padStart(2,"0"))+" · "+missions[i].name+"<small>"+(solved[i]?"COMPLETED":unlocked(i)?"READY":"Complete the previous mission")+"</small>"});
+}
+function drawBase(){
+ const c=$("scene"),x=c.getContext("2d"),w=800,h=330;
+ x.clearRect(0,0,w,h);
+ const bg=x.createLinearGradient(0,0,0,h);bg.addColorStop(0,"#102d49");bg.addColorStop(.58,"#0a1c30");bg.addColorStop(1,"#071321");
+ x.fillStyle=bg;x.fillRect(0,0,w,h);
+ // atmospheric glow pools and a subtle technical grid
+ for(const [px,py,r,col] of [[140,80,180,"#2b91a522"],[660,230,220,"#6e4ab322"],[420,160,150,"#27d5d322"]]){
+  const g=x.createRadialGradient(px,py,0,px,py,r);g.addColorStop(0,col);g.addColorStop(1,"transparent");x.fillStyle=g;x.fillRect(px-r,py-r,r*2,r*2);
+ }
+ x.strokeStyle="#9bdff00c";x.lineWidth=1;
+ for(let gx=0;gx<=w;gx+=40){x.beginPath();x.moveTo(gx,0);x.lineTo(gx,h);x.stroke()}
+ for(let gy=0;gy<=h;gy+=40){x.beginPath();x.moveTo(0,gy);x.lineTo(w,gy);x.stroke()}
+ // floating particles
+ for(let i=0;i<28;i++){let px=(i*97+Math.sin(anim*.04+i)*12)%w,py=(i*53+Math.cos(anim*.03+i)*10)%h;x.fillStyle=i%3===0?"#ffd16666":"#8deef066";x.beginPath();x.arc(px,py,1.2+(i%3)*.5,0,Math.PI*2);x.fill()}
+ return x
+}
+function glow(x,color,blur=18){x.shadowColor=color;x.shadowBlur=blur}
+function rounded(x,xx,yy,ww,hh,r,fill,stroke){
+ x.beginPath();x.roundRect(xx,yy,ww,hh,r);if(fill){x.fillStyle=fill;x.fill()}if(stroke){x.strokeStyle=stroke;x.lineWidth=1.5;x.stroke()}
+}
+function draw(){
+ const x=drawBase(),pulse=1+Math.sin(anim*.08)*.05;
+ if(missions[current].lab==="fall"||missions[current].lab==="paper"){
+  // Futuristic drop chamber
+  rounded(x,62,26,676,276,22,"#071625bb","#47718d");
+  const beam=x.createLinearGradient(0,40,0,290);beam.addColorStop(0,"#a5efff22");beam.addColorStop(.5,"#5ee7df08");beam.addColorStop(1,"#5ee7df22");
+  x.fillStyle=beam;x.fillRect(82,43,636,240);
+  x.strokeStyle="#6bdfe866";x.setLineDash([5,8]);x.lineWidth=1;x.beginPath();x.moveTo(400,44);x.lineTo(400,280);x.stroke();x.setLineDash([]);
+  // rails and landing deck
+  glow(x,"#5ee7df",12);x.fillStyle="#4d8ca8";x.fillRect(83,48,5,226);x.fillRect(712,48,5,226);x.shadowBlur=0;
+  rounded(x,78,270,644,15,7,"#27445f","#5a819d");
+  x.fillStyle="#9dc8df";x.font="bold 10px system-ui";x.letterSpacing="2px";x.fillText("DROP CHAMBER · LIVE TRACKING",104,39);
+  x.fillStyle="#7ca7c3";x.font="11px system-ui";x.fillText("START",91,64);x.fillText("LANDING ZONE",625,300);
+  let y1=anim?Math.min(250,62+anim*1.9):62,y2=anim?Math.min(250,62+anim*(current===4?3.05:2.4)):62;
+  if(missions[current].lab==="fall"){
+   // floating particle trails
+   for(let i=0;i<7;i++){x.globalAlpha=.22-i*.025;x.fillStyle="#5ee7df";x.beginPath();x.arc(280,y1-18-i*10,2.5,0,7);x.fill();x.fillStyle="#ffd166";x.beginPath();x.arc(520,y2-17-i*9,2.5,0,7);x.fill()}x.globalAlpha=1;
+   glow(x,"#5ee7df",24);const g1=x.createRadialGradient(274,y1-5,2,280,y1,24);g1.addColorStop(0,"#d8ffff");g1.addColorStop(.4,"#5ee7df");g1.addColorStop(1,"#138caa");x.fillStyle=g1;x.beginPath();x.arc(280,y1,17,0,7);x.fill();x.shadowBlur=0;
+   glow(x,"#ffd166",24);const g2=x.createRadialGradient(514,y2-5,2,520,y2,23);g2.addColorStop(0,"#fff3c8");g2.addColorStop(.4,"#ffd166");g2.addColorStop(1,"#bd7528");x.fillStyle=g2;x.beginPath();x.arc(520,y2,15,0,7);x.fill();x.shadowBlur=0;
+   rounded(x,230,84,100,25,12,"#102d43","#397d8d");rounded(x,470,84,100,25,12,"#342b24","#8d6b3b");
+   x.fillStyle="#d9faff";x.font="bold 11px system-ui";x.fillText("OBJECT A",249,101);x.fillStyle="#ffdfa0";x.fillText("OBJECT B",489,101);
+  }else{
+   // paper sheet and crumpled paper illustration
+   glow(x,"#5ee7df",20);x.save();x.translate(280,y1);x.rotate(Math.sin(anim*.03)*.22);x.fillStyle="#d5ffff";x.beginPath();x.moveTo(-29,-18);x.lineTo(27,-13);x.lineTo(30,17);x.lineTo(-27,19);x.closePath();x.fill();x.strokeStyle="#5ee7df";x.stroke();x.restore();x.shadowBlur=0;
+   glow(x,"#ffd166",20);x.fillStyle="#ffcf70";x.beginPath();x.arc(520,y2,16,0,7);x.fill();for(let i=0;i<6;i++){x.strokeStyle="#9c642a";x.beginPath();x.moveTo(520,y2);x.lineTo(520+Math.cos(i)*12,y2+Math.sin(i)*12);x.stroke()}x.shadowBlur=0;
+   x.fillStyle="#d8faff";x.font="bold 11px system-ui";x.fillText("FLAT SHEET",235,113);x.fillStyle="#ffe2a6";x.fillText("CRUMPLED",486,113);
+   // airflow streaks
+   for(let i=0;i<8;i++){let yy=145+i*13,offset=(anim*2+i*31)%95;x.strokeStyle="#75cfff55";x.lineWidth=1.5;x.beginPath();x.moveTo(100+offset,yy);x.lineTo(155+offset,yy);x.stroke()}
+  }
+ }else if(missions[current].lab==="sound"){
+  // Sound wave laboratory: layered transparent material tunnel
+  rounded(x,54,48,692,238,20,"#08192bbd","#47718d");
+  x.fillStyle="#9ac8df";x.font="bold 10px system-ui";x.letterSpacing="2px";x.fillText("ACOUSTIC TRANSMISSION CHAMBER",82,69);
+  const m=Number(values.medium),names=["AIR","WATER","STEEL"],colors=["#5ee7df","#4aa9ff","#ffd166"],color=colors[m];
+  const fill=x.createLinearGradient(0,100,0,230);fill.addColorStop(0,m===0?"#163e4d99":m===1?"#174b7899":"#76552b99");fill.addColorStop(1,"#071525dd");
+  rounded(x,88,104,624,120,17,fill,color+"88");
+  // side rails and detector/source modules
+  rounded(x,69,137,58,55,10,"#183b55","#5ee7df");rounded(x,673,137,58,55,10,"#183b55","#ffd166");
+  glow(x,color,15);x.fillStyle=color;x.beginPath();x.arc(98,165,8,0,7);x.fill();x.shadowBlur=0;
+  x.fillStyle="#ffe5a4";x.beginPath();x.arc(702,165,8,0,7);x.fill();
+  x.fillStyle="#d7edff";x.font="bold 10px system-ui";x.fillText("SOURCE",70,211);x.fillText("SENSOR",678,211);
+  // travelling wave packet
+  let pos=anim?Math.min(1,anim/100):0;
+  for(let i=0;i<7;i++){
+   let t=(pos*610+i*42)%610,xx=120+t,amp=10+i%3*3;
+   x.strokeStyle=color;x.globalAlpha=.8-i*.07;x.lineWidth=2.5;x.beginPath();
+   for(let q=0;q<=30;q++){let px=xx+q*2,py=164+Math.sin(q*.34+anim*.12+i)*amp;if(q===0)x.moveTo(px,py);else x.lineTo(px,py)}x.stroke();
+  }x.globalAlpha=1;
+  x.fillStyle=color;x.font="bold 14px system-ui";x.fillText(names[m]+" MEDIUM",335,254);
+  x.fillStyle="#9ebdd2";x.font="11px system-ui";x.fillText("VIBRATION → PARTICLE-TO-PARTICLE TRANSFER → DETECTION",165,274);
+ }else{
+  // Deep-water tank with glass edges, caustics and buoyancy markers
+  rounded(x,60,35,680,270,22,"#081827cc","#5b8ba4");
+  x.fillStyle="#bcefff";x.font="bold 10px system-ui";x.letterSpacing="2px";x.fillText("BUOYANCY OBSERVATION TANK",86,56);
+  const water=x.createLinearGradient(0,105,0,285);water.addColorStop(0,"#3ec8ed88");water.addColorStop(.35,"#1679a9bb");water.addColorStop(1,"#0a365e");
+  rounded(x,83,88,634,195,13,water,"#64cbe9aa");
+  // water surface ripples
+  for(let i=0;i<6;i++){x.strokeStyle="#b9f3ff55";x.lineWidth=1.3;x.beginPath();let yy=112+i*5+Math.sin(anim*.08+i)*2;x.moveTo(95,yy);x.quadraticCurveTo(250,yy-5,400,yy);x.quadraticCurveTo(560,yy+5,705,yy);x.stroke()}
+  // rising bubbles
+  for(let i=0;i<18;i++){let bx=110+(i*37)%580,by=260-((i*31+anim*1.3)%155);x.strokeStyle="#b9efff55";x.beginPath();x.arc(bx,by,2+(i%3),0,7);x.stroke()}
+  const sink=Number(values.density)>5,yy=anim?Math.min(242,145+anim*(sink?1.0:.05)):145;
+  // object shadow + object with gradient and specular highlight
+  x.globalAlpha=.24;x.fillStyle="#04111d";x.beginPath();x.ellipse(400,260,48,9,0,0,7);x.fill();x.globalAlpha=1;
+  const orb=x.createLinearGradient(360,yy-20,440,yy+20);orb.addColorStop(0,"#fff0bd");orb.addColorStop(.3,"#ffd166");orb.addColorStop(1,"#bd742d");
+  glow(x,"#ffd166",24);rounded(x,365,yy-22,70,44,17,orb,"#fff0b5");x.shadowBlur=0;
+  x.fillStyle="#fff7d9";x.beginPath();x.ellipse(383,yy-12,10,4,-.3,0,7);x.fill();
+  x.fillStyle="#e4f8ff";x.font="bold 12px system-ui";x.fillText(sink?"DENSER THAN FLUID · SINKING":"LOWER AVERAGE DENSITY · FLOATING",245,77);
+  // buoyant force and weight arrows
+  x.strokeStyle="#6df0d4";x.fillStyle="#6df0d4";x.lineWidth=3;x.beginPath();x.moveTo(450,yy+8);x.lineTo(450,yy-28);x.stroke();x.beginPath();x.moveTo(443,yy-20);x.lineTo(450,yy-29);x.lineTo(457,yy-20);x.stroke();
+  x.fillStyle="#ff9b9b";x.strokeStyle="#ff9b9b";x.beginPath();x.moveTo(350,yy-8);x.lineTo(350,yy+28);x.stroke();x.beginPath();x.moveTo(343,yy+20);x.lineTo(350,yy+29);x.lineTo(357,yy+20);x.stroke();
+  x.font="10px system-ui";x.fillText("BUOYANCY",462,yy-19);x.fillText("WEIGHT",300,yy+30);
+ }
+}
+function renderMission(){
+ let m=missions[current],d=labs[m.lab];values={...d.defaults,...m.setup};verdict=null;ran=false;anim=0;
+ $("caseTag").textContent="MISSION "+String(current+1).padStart(2,"0")+" · "+d.tag;
+ $("caseTitle").textContent=d.title;$("caseDesc").textContent=d.desc;
+ $("stageTitle").textContent=d.stage;$("stageHint").textContent=d.hint;
+ $("science").textContent="🔬 Science briefing: "+d.science;
+ $("missionBrief").innerHTML="<b>🎯 MISSION BRIEF</b><br>"+m.brief+"<br><span class='muted'>Reward: "+m.xp+" XP · Complete this mission to unlock the next one.</span>";
+ $("controls").innerHTML='<div class="sliders">'+d.controls.map(([key,label,min,max,step,unit])=>`<div class="control-card"><label><span>${label}</span><b id="v_${key}">${values[key]} ${unit}</b></label><input type="range" min="${min}" max="${max}" step="${step}" value="${values[key]}" data-key="${key}"></div>`).join("")+'</div>';
+ $("controls").querySelectorAll("input").forEach(el=>el.addEventListener("input",e=>{values[e.target.dataset.key]=Number(e.target.value);$("v_"+e.target.dataset.key).textContent=e.target.value+" "+d.controls.find(a=>a[0]===e.target.dataset.key)[5];draw()}));
+ $("caseStatus").textContent=solved[current]?"✓ COMPLETED":"● READY";
+ $("result").innerHTML=solved[current]?"🏅 You have already completed this mission. You can replay it to investigate again.":"🧠 Adjust the controls, run the simulation and inspect the evidence.";
+ $("submit").disabled=true;document.querySelectorAll(".choice").forEach(b=>b.classList.remove("selected"));
+ $("hint").textContent="💡 Reveal a hint";draw();updateStats();
+}
+function run(){
+ ran=true;anim=0;cancelAnimationFrame(raf);let start=performance.now();
+ function frame(t){anim=Math.min(100,(t-start)/18);draw();if(anim<100)raf=requestAnimationFrame(frame);else showResult()}
+ raf=requestAnimationFrame(frame);$("caseStatus").textContent="⚡ SIMULATING";
+}
+function showResult(){
+ let msg="",lab=missions[current].lab;
+ if(lab==="fall"){let drag=values.drag,ta=(2.8+drag*.23)*(values.height/8)**.5,tb=ta+(values.mass-2)*-.015;msg=`<strong>Race complete!</strong> Object A: ${ta.toFixed(2)} model seconds · Object B: ${tb.toFixed(2)} model seconds. The simplified model shows that mass alone has little effect when drag is equal. Air resistance can change the motion.`}
+ if(lab==="paper"){let flat=3.1+values.wind*.28,crumpled=2.15+values.wind*.08;msg=`<strong>Wind tunnel results!</strong> Flat sheet: ${flat.toFixed(2)} model seconds · Crumpled sheet: ${crumpled.toFixed(2)} model seconds. The flat sheet experiences more drag in this model.`}
+ if(lab==="sound"){let names=["air","water","steel"],speed=[343,1480,5960][values.medium];msg=`<strong>Pulse detected!</strong> The model's approximate sound speed in ${names[values.medium]} is ${speed.toLocaleString()} m/s. The pulse travels through all three types of medium; changing strength does not let sound travel through a vacuum.`}
+ if(lab==="float"){let floats=values.density<5.5;msg=`<strong>Tank test complete!</strong> At relative density ${values.density}, the object ${floats?"floats":"sinks"} in this simplified tank model. Increasing volume changes the object's size and the amount of water it can displace; average density and buoyancy both matter.`}
+ $("result").innerHTML=msg;$("caseStatus").textContent="✓ EVIDENCE READY";$("submit").disabled=false;
+}
+function buildMissionList(){
+ const list=$("missionList");
+ list.innerHTML=missions.map((m,i)=>`<button class="case-btn" data-mission="${i}">${["🪂","📄","🔊","🛟"][["fall","paper","sound","float"].indexOf(m.lab)]} ${String(i+1).padStart(2,"0")} · ${m.name}<small>${m.lab.toUpperCase()} · ${m.xp} XP</small></button>`).join("");
+ list.querySelectorAll("[data-mission]").forEach(b=>b.addEventListener("click",()=>switchMission(+b.dataset.mission)));
+}
+function switchMission(i){if(!unlocked(i))return;current=i;renderMission();}
+buildMissionList();
+$("run").addEventListener("click",run);
+$("reset").addEventListener("click",()=>{cancelAnimationFrame(raf);renderMission()});
+$("hint").addEventListener("click",()=>{$("result").innerHTML="💡 <b>Investigator hint:</b> "+missions[current].hint;$("hint").textContent="💡 Hint revealed"});
+document.querySelectorAll(".choice").forEach(b=>b.addEventListener("click",()=>{if(!ran)return;verdict=b.dataset.verdict;document.querySelectorAll(".choice").forEach(x=>x.classList.toggle("selected",x===b))}));
+$("submit").addEventListener("click",()=>{
+ if(!ran||!verdict)return;
+ let m=missions[current];
+ if(verdict===m.target){
+  let earned=0;
+  if(!solved[current]){solved[current]=true;earned=m.xp;xp+=earned;streak++;localStorage.setItem("mbSolved12",JSON.stringify(solved));localStorage.setItem("mbXP12",xp);localStorage.setItem("mbStreak12",streak)}
+  $("result").innerHTML+="<p><strong>🏆 Correct verdict! "+(earned?("+"+earned+" XP"):"Already completed — no extra XP")+" · Mission cleared!</strong></p>";
+  $("caseStatus").textContent="🏅 MISSION CLEARED";updateStats();
+  if(current<23&&!solved[current+1])$("result").innerHTML+="<p>🔓 Next mission unlocked: "+missions[current+1].name+"</p>";
+ }else{
+  streak=0;localStorage.setItem("mbStreak12",streak);updateStats();
+  $("result").innerHTML+="<p>Not quite! Re-read the evidence and science briefing, then try another verdict. Your streak resets, but you can retry.</p>";
+ }
+});
+renderMission();updateStats();
+</script></body></html>
